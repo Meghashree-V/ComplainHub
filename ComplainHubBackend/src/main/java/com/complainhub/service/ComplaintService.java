@@ -7,12 +7,22 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import org.springframework.web.client.RestTemplate;
 
+/**
+ * Service class for handling complaints
+ */
 @Service
 public class ComplaintService {
     private final String COMPLAINTS_COLLECTION = "complaints";
 
-    public ResponseEntity<?> createComplaint(Map<String, Object> payload) {
+    /**
+     * Creates a new complaint
+     *
+     * @param payload Complaint payload
+     * @return ResponseEntity with complaint ID and success message
+     */
+    public ResponseEntity createComplaint(Map<String, Object> payload) {
         try {
             // Enforce presence of 'uid' in the payload
             if (!payload.containsKey("uid") || payload.get("uid") == null || payload.get("uid").toString().trim().isEmpty()) {
@@ -43,6 +53,12 @@ public class ComplaintService {
                 Map<String, Object> complaint = new HashMap<>(data);
                 // Add the document ID
                 complaint.put("id", doc.getId());
+                // ML Priority integration: Only add if not already present
+                if (!complaint.containsKey("priority") && complaint.get("description") != null) {
+                    String description = complaint.get("description").toString();
+                    String priority = getPriorityFromML(description);
+                    complaint.put("priority", priority);
+                }
                 complaints.add(complaint);
             }
             return ResponseEntity.ok(complaints);
@@ -50,6 +66,22 @@ public class ComplaintService {
             System.err.println("[ComplaintService] Error fetching complaints:");
             e.printStackTrace();
             return ResponseEntity.status(500).body("Error fetching complaints: " + e.getMessage());
+        }
+    }
+
+    // Helper to call Flask ML API
+    private String getPriorityFromML(String complaintText) {
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            String url = "http://localhost:5001/predict";
+            Map<String, String> request = new HashMap<>();
+            request.put("text", complaintText);
+            ResponseEntity<Map> response = restTemplate.postForEntity(url, request, Map.class);
+            Object priority = response.getBody().get("priority");
+            return priority != null ? priority.toString() : "Unknown";
+        } catch (Exception e) {
+            System.err.println("[ML] Error fetching priority: " + e.getMessage());
+            return "Unknown";
         }
     }
 

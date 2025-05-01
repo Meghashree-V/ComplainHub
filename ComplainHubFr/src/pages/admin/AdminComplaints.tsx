@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, Filter, RefreshCw } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Link } from "react-router-dom";
 
 const AdminComplaints = () => {
   const [complaints, setComplaints] = useState<Complaint[]>([]);
@@ -45,7 +46,7 @@ const AdminComplaints = () => {
             updatedAt: complaint.updatedAt ? new Date(complaint.updatedAt) : null,
             // Ensure other required fields have defaults
             status: complaint.status || 'pending',
-            priority: complaint.priority || 'low',
+            priority: complaint.priority || 'Unknown',
             category: complaint.category || 'general',
             comments: Array.isArray(complaint.comments) ? complaint.comments : []
           };
@@ -203,119 +204,95 @@ const AdminComplaints = () => {
 
   return (
     <AdminLayout>
-      <div className="space-y-6">
-        {/* Header Section */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold">All Complaints</h1>
-            <p className="text-muted-foreground">Manage and process all student-submitted complaints</p>
+            <h1 className="text-2xl font-bold">Manage Complaints</h1>
+            <p className="text-muted-foreground">View and manage all complaints in the system</p>
           </div>
-          <Button
-            variant="outline"
-            onClick={() => window.location.reload()}
-            aria-label="Refresh complaints list"
-          >
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Refresh
-          </Button>
-        </div>
-
-        {/* Filters Section */}
-        <div className="glass-card rounded-xl p-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Search Input */}
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search complaints, students, departments..."
-                className="pl-9"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                aria-label="Search complaints"
-              />
-            </div>
-
-            {/* Category Filter */}
-            <div className="flex items-center gap-2">
-              <Filter className="h-4 w-4 text-muted-foreground" />
-              <Select
-                value={categoryFilter}
-                onValueChange={setCategoryFilter}
-                aria-label="Filter by category"
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Filter by category" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Categories</SelectItem>
-                  <SelectItem value="academic">Academic</SelectItem>
-                  <SelectItem value="hostel">Hostel</SelectItem>
-                  <SelectItem value="transport">Transport</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Status Filter */}
-            <div className="flex items-center gap-2">
-              <Filter className="h-4 w-4 text-muted-foreground" />
-              <Select
-                value={statusFilter}
-                onValueChange={setStatusFilter}
-                aria-label="Filter by status"
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Filter by status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Statuses</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="in-progress">In Progress</SelectItem>
-                  <SelectItem value="resolved">Resolved</SelectItem>
-                  <SelectItem value="rejected">Rejected</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="flex gap-2 mt-2 md:mt-0">
+            <Button variant="outline" size="icon" onClick={() => window.location.reload()} disabled={isLoading}>
+              <RefreshCw className={isLoading ? "animate-spin" : ""} />
+            </Button>
           </div>
         </div>
-
-        {/* Tabs and Complaints List */}
-        <Tabs defaultValue="all" value={statusFilter} onValueChange={setStatusFilter}>
-          <TabsList className="mb-6">
+        <div className="flex flex-col md:flex-row gap-2 md:items-center">
+          <div className="flex-1 flex gap-2">
+            <Input
+              placeholder="Search complaints..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="max-w-xs"
+            />
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-[120px]">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All</SelectItem>
+                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="resolved">Resolved</SelectItem>
+                <SelectItem value="rejected">Rejected</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+              <SelectTrigger className="w-[120px]">
+                <SelectValue placeholder="Category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All</SelectItem>
+                <SelectItem value="general">General</SelectItem>
+                <SelectItem value="infrastructure">Infrastructure</SelectItem>
+                <SelectItem value="hostel">Hostel</SelectItem>
+                <SelectItem value="academic">Academic</SelectItem>
+                <SelectItem value="mess">Mess</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+        <Tabs defaultValue="all" className="w-full mt-4">
+          <TabsList>
             <TabsTrigger value="all">All</TabsTrigger>
             <TabsTrigger value="pending">Pending</TabsTrigger>
-            <TabsTrigger value="in-progress">In Progress</TabsTrigger>
             <TabsTrigger value="resolved">Resolved</TabsTrigger>
             <TabsTrigger value="rejected">Rejected</TabsTrigger>
           </TabsList>
-
-          {isLoading ? (
-            <div className="flex justify-center py-12">
-              <div className="animate-pulse flex flex-col w-full space-y-4">
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <div key={i} className="bg-muted rounded-lg h-24 w-full" />
+          <TabsContent value="all">
+            {isLoading ? (
+              <div className="text-center py-8">Loading complaints...</div>
+            ) : filteredComplaints.length === 0 ? (
+              <div className="text-center py-8">No complaints found.</div>
+            ) : (
+              <div className="flex flex-col gap-2">
+                <div className="grid grid-cols-5 gap-2 font-bold text-base text-gray-700 bg-gray-100 dark:bg-gray-800 px-4 py-3 rounded-t-lg sticky top-0 z-10 border-b-2 border-gray-400 dark:border-gray-600">
+                  <div className="truncate">Title</div>
+                  <div className="truncate">Description</div>
+                  <div className="truncate">Category</div>
+                  <div className="truncate">Priority</div>
+                  <div className="truncate">Status</div>
+                </div>
+                {filteredComplaints.map((complaint, idx) => (
+                  <div
+                    key={complaint.id}
+                    className={`grid grid-cols-5 gap-2 items-center px-4 py-3 text-sm border-b-2 border-gray-400 dark:border-gray-600 transition-colors duration-150 ${idx % 2 === 0 ? 'bg-white dark:bg-gray-900' : 'bg-gray-50 dark:bg-gray-800'} hover:bg-blue-50 dark:hover:bg-gray-700`}
+                    style={{ borderBottomLeftRadius: idx === filteredComplaints.length - 1 ? '0.5rem' : undefined, borderBottomRightRadius: idx === filteredComplaints.length - 1 ? '0.5rem' : undefined }}
+                  >
+                    <div className="truncate max-w-xs font-semibold text-blue-700 hover:underline cursor-pointer">
+                      <Link to={`/admin/complaints/${complaint.id}`}>{complaint.title || 'Untitled'}</Link>
+                    </div>
+                    <div className="truncate max-w-xs" title={complaint.description}>{complaint.description}</div>
+                    <div className="capitalize">{complaint.category}</div>
+                    <div>
+                      <span className={`px-3 py-1 rounded-full text-xs font-bold ${complaint.priority === 'high' ? 'bg-red-100 text-red-700' : complaint.priority === 'medium' ? 'bg-orange-100 text-orange-700' : complaint.priority === 'low' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>{complaint.priority || 'Unknown'}</span>
+                    </div>
+                    <div className="capitalize font-medium">
+                      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${complaint.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : complaint.status === 'resolved' ? 'bg-green-100 text-green-800' : complaint.status === 'rejected' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-700'}`}>{complaint.status}</span>
+                    </div>
+                  </div>
                 ))}
               </div>
-            </div>
-          ) : (
-            <div>
-              {filteredComplaints.length > 0 ? (
-                filteredComplaints.map((complaint) => (
-                  <ComplaintListItem
-                    key={complaint.id}
-                    complaint={complaint}
-                    isAdmin
-                    onStatusChange={handleStatusChange}
-                    onAddComment={handleAddComment}
-                  />
-                ))
-              ) : (
-                <div className="glass-card rounded-lg p-8 text-center">
-                  <h3 className="text-lg font-medium mb-2">No complaints found</h3>
-                  <p className="text-muted-foreground">Try changing your filters or search query</p>
-                </div>
-              )}
-            </div>
-          )}
+            )}
+          </TabsContent>
         </Tabs>
       </div>
     </AdminLayout>

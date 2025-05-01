@@ -260,7 +260,9 @@ const AdminComplaintDetail = () => {
                       : "secondary"
                   }
                 >
-                  {complaint.priority.charAt(0).toUpperCase() + complaint.priority.slice(1)} Priority
+                  {complaint.priority && typeof complaint.priority === 'string' && complaint.priority.length > 0
+  ? complaint.priority.charAt(0).toUpperCase() + complaint.priority.slice(1)
+  : 'Unknown'} Priority
                 </Badge>
               </div>
               <p className="text-muted-foreground mb-4">{complaint.description}</p>
