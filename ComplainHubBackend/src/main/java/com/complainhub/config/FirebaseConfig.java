@@ -13,8 +13,13 @@ import java.io.InputStream;
 public class FirebaseConfig {
     @PostConstruct
     public void init() {
+        // Log the GOOGLE_APPLICATION_CREDENTIALS environment variable
+        String envCreds = System.getenv("GOOGLE_APPLICATION_CREDENTIALS");
+        System.out.println("[FIREBASE CONFIG] GOOGLE_APPLICATION_CREDENTIALS=" + envCreds);
+
         try {
             InputStream serviceAccount = getClass().getClassLoader().getResourceAsStream("firebase-service-account.json");
+            System.out.println("[FIREBASE CONFIG] Attempting to load firebase-service-account.json from classpath: " + (serviceAccount != null));
             if (serviceAccount == null) {
                 System.err.println("[FIREBASE CONFIG] firebase-service-account.json NOT FOUND in classpath!");
                 throw new RuntimeException("firebase-service-account.json not found in classpath");

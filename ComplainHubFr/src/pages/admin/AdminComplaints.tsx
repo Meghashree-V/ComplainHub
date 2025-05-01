@@ -24,7 +24,15 @@ const AdminComplaints = () => {
       setIsLoading(true);
       try {
         const res = await fetch("/api/complaint/all");
-        if (!res.ok) throw new Error("Failed to fetch complaints");
+        let errorText = '';
+        if (!res.ok) {
+          try {
+            errorText = await res.text();
+          } catch (e) {
+            errorText = 'Failed to fetch complaints (and no error body)';
+          }
+          throw new Error(errorText || "Failed to fetch complaints");
+        }
         const data = await res.json();
         
         // Transform and validate the data from the backend
@@ -48,7 +56,7 @@ const AdminComplaints = () => {
         setFilteredComplaints(complaintsData);
       } catch (error) {
         console.error("Error fetching complaints:", error);
-        toast.error("Failed to load complaints");
+        toast.error(error && typeof error === 'object' && 'message' in error ? (error as Error).message : "Failed to load complaints");
       } finally {
         setIsLoading(false);
       }

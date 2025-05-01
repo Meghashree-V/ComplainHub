@@ -14,6 +14,10 @@ public class ComplaintService {
 
     public ResponseEntity<?> createComplaint(Map<String, Object> payload) {
         try {
+            // Enforce presence of 'uid' in the payload
+            if (!payload.containsKey("uid") || payload.get("uid") == null || payload.get("uid").toString().trim().isEmpty()) {
+                return ResponseEntity.badRequest().body("Missing 'uid' in complaint payload. Complaint must be associated with a user.");
+            }
             Firestore db = FirestoreClient.getFirestore();
             payload.put("timestamp", new Date());
             ApiFuture<DocumentReference> future = db.collection(COMPLAINTS_COLLECTION).add(payload);
@@ -28,35 +32,23 @@ public class ComplaintService {
 
     public ResponseEntity<?> getAllComplaints() {
         try {
+            System.out.println("[ComplaintService] Fetching all complaints from Firestore...");
             Firestore db = FirestoreClient.getFirestore();
             ApiFuture<QuerySnapshot> future = db.collection(COMPLAINTS_COLLECTION).get();
             List<QueryDocumentSnapshot> documents = future.get().getDocuments();
             List<Map<String, Object>> complaints = new ArrayList<>();
             for (QueryDocumentSnapshot doc : documents) {
-                Map<String, Object> complaint = new HashMap<>();
-                complaint.put("id", doc.getId());
                 Map<String, Object> data = doc.getData();
-                // Fill all required fields with defaults if missing
-                complaint.put("title", data.getOrDefault("title", ""));
-                complaint.put("description", data.getOrDefault("description", ""));
-                complaint.put("category", data.getOrDefault("category", "others"));
-                complaint.put("status", data.getOrDefault("status", "pending"));
-                complaint.put("priority", data.getOrDefault("priority", "low"));
-                complaint.put("studentId", data.getOrDefault("studentId", ""));
-                complaint.put("studentName", data.getOrDefault("studentName", ""));
-                complaint.put("department", data.getOrDefault("department", ""));
-                complaint.put("createdAt", data.getOrDefault("createdAt", new Date()));
-                complaint.put("updatedAt", data.getOrDefault("updatedAt", new Date()));
-                complaint.put("comments", data.getOrDefault("comments", new ArrayList<>()));
-                complaint.put("updates", data.getOrDefault("updates", new ArrayList<>()));
-                complaint.put("assignedTo", data.getOrDefault("assignedTo", ""));
-                complaint.put("resolvedAt", data.getOrDefault("resolvedAt", null));
-                complaint.put("rejectionReason", data.getOrDefault("rejectionReason", ""));
-                complaint.put("imageUrl", data.getOrDefault("imageUrl", ""));
+                // For admin, include all fields from the complaint document
+                Map<String, Object> complaint = new HashMap<>(data);
+                // Add the document ID
+                complaint.put("id", doc.getId());
                 complaints.add(complaint);
             }
             return ResponseEntity.ok(complaints);
         } catch (Exception e) {
+            System.err.println("[ComplaintService] Error fetching complaints:");
+            e.printStackTrace();
             return ResponseEntity.status(500).body("Error fetching complaints: " + e.getMessage());
         }
     }
