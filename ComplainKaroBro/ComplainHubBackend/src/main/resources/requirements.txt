@@ -1,5 +1,7 @@
 pandas
 scikit-learn
+transformers
+torch
 joblib
 fastapi
 uvicorn

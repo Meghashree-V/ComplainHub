@@ -40,4 +40,11 @@ public class ComplaintController {
     public ResponseEntity<?> addAdminComment(@PathVariable String id, @RequestBody Map<String, Object> payload) {
         return complaintService.addAdminComment(id, payload);
     }
+
+    // ADMIN: Classify complaint priority
+    @PostMapping("/admin/classify-priority")
+    public ResponseEntity<?> classifyComplaintPriority(@RequestBody Map<String, String> payload) {
+        String complaint = payload.getOrDefault("complaint", "");
+        return complaintService.classifyComplaintPriority(complaint);
+    }
 }
