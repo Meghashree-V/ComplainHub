@@ -7,6 +7,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity as SpringResponseEntity;
+import java.util.Collections;
 
 @Service
 public class ComplaintService {
@@ -151,6 +157,22 @@ public class ComplaintService {
             return ResponseEntity.ok("Comment added successfully");
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Error adding comment: " + e.getMessage());
+        }
+    }
+
+    // ADMIN: Classify complaint priority using ML API
+    public ResponseEntity<?> classifyComplaintPriority(String complaintText) {
+        try {
+            String apiUrl = "http://localhost:8000/predict_priority";
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            String payload = String.format("{\"complaint\": \"%s\"}", complaintText.replace("\"", "\\\""));
+            HttpEntity<String> request = new HttpEntity<>(payload, headers);
+            org.springframework.http.ResponseEntity<Map> response = restTemplate.postForEntity(apiUrl, request, Map.class);
+            return ResponseEntity.ok(response.getBody());
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error classifying complaint priority: " + e.getMessage());
         }
     }
 }
