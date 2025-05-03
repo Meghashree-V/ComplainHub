@@ -1,0 +1,24 @@
+# Firebase service account
+**/firebase-service-account.json
+**/target/
+**/.env
+**/.env.*
+**/application-*.properties
+**/application.properties
+
+# IDE files
+**/.idea/
+**/.vscode/
+*.iml
+
+# Dependencies
+**/node_modules/
+**/dist/
+**/build/
+
+# Logs
+**/logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
