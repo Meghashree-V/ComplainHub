@@ -78,12 +78,14 @@ const AuthContextProvider: React.FC<{ children: React.ReactNode }> = ({
               bio: userData.bio || "",
             });
           } else {
-            console.error("User document not found in Firestore.");
-            toast.error("User data not found. Please contact support.");
+            // If user doc not found, treat as unauthenticated for frontend safety
+            setUser(null);
+            toast.error("User data not found. Please log in again or contact support.");
           }
         } catch (error) {
-          console.error("Error fetching user data:", error);
-          toast.error("Failed to fetch user data.");
+          // If Firestore is unavailable or misconfigured, treat as unauthenticated
+          setUser(null);
+          toast.error("Could not fetch user data. Please try again later.");
         }
       } else {
         setUser(null);
