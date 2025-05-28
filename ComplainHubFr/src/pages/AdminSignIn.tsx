@@ -91,130 +91,83 @@ const AdminSignIn = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row">
-      {/* Left side - Background image for desktop */}
-      <div className="hidden md:flex md:w-1/2 bg-gradient-to-br from-red-600 to-red-800 relative">
-        <div className="absolute inset-0 bg-black/20"></div>
-        <div className="relative z-10 flex flex-col justify-center items-center p-12 text-white">
-          <Shield className="h-12 w-12 mb-6" />
-          <h1 className="text-4xl font-bold mb-4">Admin Portal</h1>
-          <p className="text-xl max-w-md text-center text-white/90">
-            Sign in to access the administrator dashboard and manage student complaints.
-          </p>
+    <div className="min-h-screen flex flex-col md:flex-row bg-white">
+      {/* Left Side: Welcome Message */}
+      <div className="hidden md:flex flex-col items-center justify-center w-1/2 bg-gradient-to-br from-blue-400 via-teal-400 to-blue-600 text-white p-12 min-h-screen">
+        <div className="flex flex-col items-center justify-center h-full w-full">
+          {/* Shield Icon */}
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 48 48" strokeWidth={1.5} stroke="currentColor" className="w-16 h-16 mb-6">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M24 4l18 8.25v9.25c0 9.25-7.5 16.5-18 20-10.5-3.5-18-10.75-18-20V12.25L24 4z" />
+          </svg>
+          <h2 className="text-3xl font-bold mb-2 text-center">Admin Portal</h2>
+          <p className="text-base text-center max-w-xs">Sign in to access the administrator dashboard and manage student complaints.</p>
         </div>
       </div>
-
-      {/* Right side - Sign in form */}
-      <div className="flex-1 flex items-center justify-center p-6 md:p-12 bg-white dark:bg-background">
-        <motion.div
-          className="w-full max-w-md"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-        >
-          {/* Mobile header - only visible on mobile */}
-          <div className="flex flex-col items-center mb-8 md:hidden">
-            <Shield className="h-10 w-10 text-red-600 mb-4" />
-            <h1 className="text-3xl font-bold">Admin Portal</h1>
-            <p className="text-muted-foreground text-center mt-2">
-              Sign in to manage complaints
-            </p>
+      {/* Right Side: Admin Login Form */}
+      <div className="flex flex-1 items-center justify-center min-h-screen bg-white">
+        <div className="bg-white/90 rounded-2xl shadow-xl w-full max-w-md flex flex-col px-8 py-10">
+          <h2 className="text-2xl font-bold text-gray-800 mb-8 text-center">Administrator Sign In</h2>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-gray-700">Admin Email</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="email"
+                        placeholder="admin@college.edu"
+                        autoComplete="username"
+                        className="bg-white border border-gray-300 focus:border-blue-400 px-3 py-2 rounded-md text-gray-800"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-gray-700">Password</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="password"
+                        placeholder="Password"
+                        autoComplete="current-password"
+                        className="bg-white border border-gray-300 focus:border-blue-400 px-3 py-2 rounded-md text-gray-800"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              {error && <div className="text-red-600 text-sm text-center">{error}</div>}
+              <Button type="submit" size="lg" className="w-full rounded-full bg-red-500 hover:bg-red-600 text-white font-semibold transition-colors duration-200 mt-2" disabled={isSubmitting}>
+                {isSubmitting ? <Loader2 className="animate-spin h-5 w-5 mr-2" /> : null}
+                Sign in as Administrator
+              </Button>
+            </form>
+          </Form>
+          <div className="flex justify-center items-center mt-4 text-gray-600 text-sm">
+            Student?&nbsp;
+            <Link to="/signin" className="text-blue-600 hover:underline">Go to student login</Link>
           </div>
-
-          <div className="glass-card p-8 rounded-xl">
-            <h2 className="text-2xl font-bold mb-6 hidden md:block">Administrator Sign In</h2>
-
-            {error && (
-              <div
-                className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4"
-                role="alert"
-              >
-                <p>{error}</p>
-              </div>
-            )}
-
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                {/* Email Field */}
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Admin Email</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="admin@college.edu"
-                          {...field}
-                          autoComplete="email"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {/* Password Field */}
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Password</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="password"
-                          placeholder="••••••••"
-                          {...field}
-                          autoComplete="current-password"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {/* Submit Button */}
-                <Button
-                  type="submit"
-                  className="w-full bg-red-600 hover:bg-red-700"
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Signing in...
-                    </>
-                  ) : (
-                    "Sign In as Administrator"
-                  )}
-                </Button>
-              </form>
-            </Form>
-
-            <div className="mt-6 text-center text-sm">
-              <span className="text-muted-foreground">Student?</span>{" "}
-              <Link to="/signin" className="text-primary font-medium hover:underline">
-                Go to student login
-              </Link>
-            </div>
-
-            {/* Demo account info */}
-            <div className="mt-8 text-sm border-t pt-4">
-              <p className="text-muted-foreground mb-2 text-center font-medium">
-                Demo Admin Account
-              </p>
-              <div className="text-xs rounded bg-secondary p-2">
-                <p>
-                  <span className="font-medium">Admin:</span> admin@college.edu
-                </p>
-                <p>
-                  <span className="font-medium">Password:</span> password
-                </p>
-              </div>
-            </div>
+          <div className="flex items-center my-4">
+            <div className="flex-grow border-t border-gray-200"></div>
+            <span className="mx-3 text-gray-400 text-xs">Demo Admin Account</span>
+            <div className="flex-grow border-t border-gray-200"></div>
           </div>
-        </motion.div>
+          <div className="bg-gray-100 rounded-lg px-4 py-3 text-gray-700 text-sm">
+            <div><span className="font-semibold">Admin:</span> admin@college.edu</div>
+            <div><span className="font-semibold">Password:</span> password</div>
+          </div>
+        </div>
       </div>
     </div>
   );

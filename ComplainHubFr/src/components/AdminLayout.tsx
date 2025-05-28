@@ -89,7 +89,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           <SidebarHeader className="px-6 py-5">
             <div className="flex items-center gap-2 text-indigo-600 font-medium text-lg">
               <Shield className="w-5 h-5" />
-              <span>ComplainHub Admin</span>
+              <span>Campus Resolve Admin</span>
             </div>
           </SidebarHeader>
 

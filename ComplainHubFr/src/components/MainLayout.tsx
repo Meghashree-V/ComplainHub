@@ -69,7 +69,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     const pathSegments = location.pathname.split("/").filter(Boolean);
     const lastSegment = pathSegments[pathSegments.length - 1] || "dashboard";
     const title =
-      lastSegment.charAt(0).toUpperCase() + lastSegment.slice(1) + " - ComplainHub";
+      lastSegment.charAt(0).toUpperCase() + lastSegment.slice(1) + " - Campus Resolve";
     document.title = title;
   }, [location.pathname]);
 
@@ -80,7 +80,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           <SidebarHeader className="px-6 py-5">
             <div className="flex items-center gap-2 text-primary font-medium text-lg">
               <FileText className="w-5 h-5" />
-              <span>ComplainHub</span>
+              <span>Campus Resolve</span>
             </div>
           </SidebarHeader>
 
@@ -159,7 +159,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 <h1 className="text-xl font-medium">
                   {navigationItems.find(
                     (item) => item.path === location.pathname
-                  )?.title || "ComplainHub"}
+                  )?.title || "Campus Resolve"}
                 </h1>
               </div>
             </div>

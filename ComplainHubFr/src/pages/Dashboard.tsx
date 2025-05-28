@@ -4,9 +4,9 @@ import { motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import MainLayout from "@/components/MainLayout";
 import StatisticCard from "@/components/StatisticCard";
-import ComplaintListItem from "@/components/ComplaintListItem";
+import CampusResolveListItem from "../components/CampusResolveListItem";
 import { Button } from "@/components/ui/button";
-import { Complaint } from "@/lib/types";
+import { CampusResolve } from "@/lib/types";
 import { collection, getDocs, query, where, orderBy } from "firebase/firestore";
 import { db } from "@/firebaseConfig";
 import {
@@ -20,12 +20,12 @@ import {
 
 const Dashboard = () => {
   const { user, isAdmin } = useAuth();
-  const [complaints, setComplaints] = useState<Complaint[]>([]);
+  const [campusResolves, setCampusResolves] = useState<CampusResolve[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const fetchComplaints = async () => {
+    const fetchCampusResolves = async () => {
       setIsLoading(true);
       setError("");
 
@@ -34,19 +34,19 @@ const Dashboard = () => {
           const complaintsRef = collection(db, "complaints");
           const q = query(
             complaintsRef,
-            where("studentId", "==", user.studentId || user.uid), // Students see their own complaints
+            where("studentId", "==", user.studentId || (user as any)?.uid), // Students see their own complaints
             orderBy("createdAt", "desc")
           );
 
           const querySnapshot = await getDocs(q);
-          const fetchedComplaints = querySnapshot.docs.map((doc) => ({
+          const fetchedCampusResolves = querySnapshot.docs.map((doc) => ({
             id: doc.id,
             ...doc.data(),
             createdAt: doc.data().createdAt?.toDate ? doc.data().createdAt.toDate() : null,
             updatedAt: doc.data().updatedAt?.toDate ? doc.data().updatedAt.toDate() : null,
-          })) as Complaint[];
+          })) as CampusResolve[];
 
-          setComplaints(fetchedComplaints);
+          setCampusResolves(fetchedCampusResolves);
         } else {
           setError("Unauthorized access. Redirecting...");
         }
@@ -58,7 +58,7 @@ const Dashboard = () => {
       }
     };
 
-    fetchComplaints();
+    fetchCampusResolves();
   }, [user, isAdmin]);
 
   // Redirect admins to the admin dashboard
@@ -67,11 +67,11 @@ const Dashboard = () => {
   }
 
   // Calculate statistics
-  const totalComplaints = complaints.length;
-  const resolvedComplaints = complaints.filter((c) => c.status === "resolved").length;
-  const pendingComplaints = complaints.filter((c) => c.status === "pending").length;
-  const rejectedComplaints = complaints.filter((c) => c.status === "rejected").length;
-  const recentComplaints = complaints.slice(0, 5);
+  const totalCampusResolves = campusResolves.length;
+  const resolvedCampusResolves = campusResolves.filter((c) => c.status === "resolved").length;
+  const pendingCampusResolves = campusResolves.filter((c) => c.status === "pending").length;
+  const rejectedCampusResolves = campusResolves.filter((c) => c.status === "rejected").length;
+  const recentCampusResolves = campusResolves.slice(0, 5);
 
   return (
     <MainLayout>
@@ -81,20 +81,22 @@ const Dashboard = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
-          className="glass-card rounded-xl p-6 md:p-8"
+          className="glass-card rounded-xl p-6 md:p-8 relative overflow-hidden"
         >
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          {/* Overlay for contrast */}
+          <div className="absolute inset-0 bg-black/30 pointer-events-none rounded-xl" />
+          <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-4 z-10">
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold">
+              <h1 className="text-2xl md:text-3xl font-bold text-white drop-shadow-lg">
                 Welcome back, {user?.name?.split(" ")[0] || "User"}
               </h1>
-              <p className="text-muted-foreground mt-1">
-                Here's an overview of your complaints and their status
+              <p className="mt-1 text-white font-semibold drop-shadow-md">
+                Here's an overview of your Campus Resolve complaints and their status
               </p>
             </div>
-            <Button asChild>
+            <Button asChild className="bg-teal-700 hover:bg-teal-800">
               <Link to="/complaints/new">
-                <PlusCircle className="h-4 w-4 mr-2" />
+                <PlusCircle className="h-4 w-4 mr-2 text-white" />
                 New Complaint
               </Link>
             </Button>
@@ -104,40 +106,44 @@ const Dashboard = () => {
         {/* Statistics */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatisticCard
-            title="Total Complaints"
-            value={totalComplaints}
+            title="Total Campus Resolves"
+            value={totalCampusResolves}
             icon={FileText}
             index={0}
+            className="bg-teal-500 text-white"
           />
           <StatisticCard
             title="Resolved"
-            value={resolvedComplaints}
-            description={`${Math.round((resolvedComplaints / totalComplaints) * 100) || 0}% of total`}
+            value={resolvedCampusResolves}
+            description={`${Math.round((resolvedCampusResolves / totalCampusResolves) * 100) || 0}% of total`}
             icon={CheckCircle}
             index={1}
+            className="bg-teal-500 text-white"
           />
           <StatisticCard
             title="Pending"
-            value={pendingComplaints}
+            value={pendingCampusResolves}
             icon={Clock}
             index={2}
+            className="bg-teal-500 text-white"
           />
           <StatisticCard
             title="Rejected"
-            value={rejectedComplaints}
+            value={rejectedCampusResolves}
             icon={AlertCircle}
             index={3}
+            className="bg-teal-500 text-white"
           />
         </div>
 
         {/* Recent complaints */}
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold">Recent Complaints</h2>
-            <Button variant="ghost" size="sm" asChild>
+            <h2 className="text-xl font-bold">Recent Campus Resolves</h2>
+            <Button variant="ghost" size="sm" asChild className="bg-teal-700 hover:bg-teal-800">
               <Link to="/complaints">
                 View All
-                <ArrowRight className="ml-1 h-4 w-4" />
+                <ArrowRight className="ml-1 h-4 w-4 text-white" />
               </Link>
             </Button>
           </div>
@@ -146,7 +152,7 @@ const Dashboard = () => {
             <div className="flex justify-center py-12">
               <div className="animate-pulse flex flex-col w-full space-y-4">
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="bg-muted rounded-lg h-24 w-full" />
+                  <div key={i} className="bg-teal-500 rounded-lg h-24 w-full" />
                 ))}
               </div>
             </div>
@@ -154,26 +160,26 @@ const Dashboard = () => {
             <div className="text-center py-8">
               <p className="text-red-600">{error}</p>
             </div>
-          ) : recentComplaints.length > 0 ? (
+          ) : recentCampusResolves.length > 0 ? (
             <div className="space-y-2">
-              {recentComplaints.map((complaint, index) => (
-                <ComplaintListItem
+              {recentCampusResolves.map((complaint, index) => (
+                <CampusResolveListItem
                   key={complaint.id}
-                  complaint={complaint}
+                  campusResolve={complaint}
                   index={index}
                 />
               ))}
             </div>
           ) : (
-            <div className="glass-card rounded-lg p-8 text-center">
+            <div className="glass-card rounded-lg p-8 text-center bg-teal-500 text-white">
               <h3 className="text-lg font-medium mb-2">No complaints yet</h3>
               <p className="text-muted-foreground mb-4">
                 You haven't submitted any complaints yet. Start by creating your first complaint.
               </p>
-              <Button asChild>
+              <Button asChild className="bg-teal-700 hover:bg-teal-800">
                 <Link to="/complaints/new">
-                  <PlusCircle className="h-4 w-4 mr-2" />
-                  New Complaint
+                  <PlusCircle className="h-4 w-4 mr-2 text-white" />
+                  New Campus Resolve
                 </Link>
               </Button>
             </div>

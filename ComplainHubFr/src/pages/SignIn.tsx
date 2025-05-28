@@ -16,7 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { FileText, Loader2 } from "lucide-react";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "@/firebase-config"; // Assuming you have this set up
+import { auth } from "@/firebaseConfig"; // Corrected import path
 import { toast } from "sonner"; // For user notifications
 
 const formSchema = z.object({
@@ -86,15 +86,24 @@ const SignIn = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row">
-      {/* Left side - Background image for desktop */}
-      <div className="hidden md:flex md:w-1/2 bg-gradient-to-br from-primary to-primary/70 relative">
-        <div className="absolute inset-0 bg-black/20"></div>
-        <div className="relative z-10 flex flex-col justify-center items-center p-12 text-white">
-          <FileText className="h-12 w-12 mb-6" />
-          <h1 className="text-4xl font-bold mb-4">Welcome Back</h1>
-          <p className="text-xl max-w-md text-center text-white/90">
-            Sign in to access your dashboard and manage your complaints.
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-teal-100 via-white to-teal-50 relative overflow-hidden">
+  {/* Animated background shapes */}
+  <div className="absolute -top-24 -left-32 w-[400px] h-[400px] bg-teal-200 opacity-30 rounded-full blur-3xl animate-pulse z-0"></div>
+  <div className="absolute bottom-0 right-0 w-[300px] h-[300px] bg-teal-300 opacity-30 rounded-full blur-2xl animate-pulse z-0"></div>
+  <div className="relative z-10 w-full max-w-md mx-auto">
+    <div className="glass-card p-10 rounded-3xl shadow-2xl flex flex-col items-center">
+      {/* Campus SVG illustration */}
+      <svg width="64" height="64" fill="none" viewBox="0 0 64 64" className="mb-6">
+        <circle cx="32" cy="32" r="32" fill="#06b6d4"/>
+        <rect x="18" y="28" width="28" height="16" rx="4" fill="#fff"/>
+        <rect x="24" y="36" width="16" height="6" rx="2" fill="#06b6d4"/>
+        <rect x="28" y="32" width="8" height="4" rx="1" fill="#06b6d4"/>
+        <rect x="30" y="38" width="4" height="6" rx="1" fill="#fff"/>
+      </svg>
+      <h1 className="text-3xl font-extrabold mb-2 text-teal-900 text-center drop-shadow-lg">Welcome to Campus Resolve</h1>
+      <p className="mb-6 text-lg text-teal-700 text-center">Sign in to access your dashboard and manage your campus life.</p>          <h1 className="text-4xl font-extrabold mb-4 drop-shadow-lg">Welcome Back</h1>
+          <p className="text-xl max-w-md text-center text-white/90 font-medium drop-shadow">
+            Sign in to access your Campus Resolve dashboard and manage your campus issues.
           </p>
         </div>
       </div>
@@ -159,7 +168,7 @@ const SignIn = () => {
 
                 <Button
                   type="submit"
-                  className="w-full"
+                  className="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold shadow-lg"
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? (
@@ -168,7 +177,7 @@ const SignIn = () => {
                       Signing in...
                     </>
                   ) : (
-                    "Sign In"
+                    "Sign In as Student"
                   )}
                 </Button>
               </form>

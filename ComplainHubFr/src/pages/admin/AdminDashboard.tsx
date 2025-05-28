@@ -10,16 +10,16 @@ import { ArrowRight, AlertCircle, FileText } from "lucide-react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/firebaseConfig";
 import { useAuth } from "@/contexts/AuthContext";
-import { Complaint } from "@/lib/types";
+import { CampusResolve } from "@/lib/types";
 
 const AdminDashboard = () => {
   const { user, isAdmin } = useAuth();
-  const [complaints, setComplaints] = useState<Complaint[]>([]);
+  const [campusResolves, setCampusResolves] = useState<CampusResolve[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const fetchComplaints = async () => {
+    const fetchCampusResolves = async () => {
       setIsLoading(true);
       setError("");
 
@@ -32,8 +32,8 @@ const AdminDashboard = () => {
             ...doc.data(),
             createdAt: doc.data().createdAt?.toDate ? doc.data().createdAt.toDate() : null,
             updatedAt: doc.data().updatedAt?.toDate ? doc.data().updatedAt.toDate() : null,
-          })) as Complaint[];
-          setComplaints(complaintsData);
+          })) as CampusResolve[];
+          setCampusResolves(complaintsData);
         } else {
           setError("Unauthorized access. Redirecting...");
         }
@@ -45,7 +45,7 @@ const AdminDashboard = () => {
       }
     };
 
-    fetchComplaints();
+    fetchCampusResolves();
   }, [isAdmin]);
 
   // Redirect non-admin users to the student dashboard
@@ -55,10 +55,10 @@ const AdminDashboard = () => {
 
   // Analyze complaints by category
   const categoryData =
-    complaints.length > 0
+    campusResolves.length > 0
       ? Object.entries(
-          complaints.reduce((acc, complaint) => {
-            const category = complaint.category || "Uncategorized";
+          campusResolves.reduce((acc, campusResolve) => {
+            const category = campusResolve.category || "Uncategorized";
             if (!acc[category]) {
               acc[category] = 0;
             }
@@ -69,25 +69,27 @@ const AdminDashboard = () => {
       : [];
 
   // Colors for the pie chart
-  const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884d8", "#82ca9d"];
+  const COLORS = ["#0097A7", "#00C49F", "#FFBB28", "#FF8042", "#8884d8", "#82ca9d"];
 
   return (
     <AdminLayout>
       <div className="space-y-8">
-        {/* Complaints Overview Section */}
+        {/* Campus Resolve Overview Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
         >
-          <Card>
+          <Card className="bg-glass-teal rounded-2xl shadow-md">
             <CardHeader>
-              <CardTitle>Complaints Overview</CardTitle>
+              <CardTitle className="text-teal-500">Campus Resolve Overview</CardTitle>
             </CardHeader>
             <CardContent>
               <Tabs defaultValue="category">
                 <TabsList>
-                  <TabsTrigger value="category">By Category</TabsTrigger>
+                  <TabsTrigger value="category" className="bg-teal-500 rounded-lg">
+                    By Category
+                  </TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="category" className="pt-4">
@@ -137,12 +139,12 @@ const AdminDashboard = () => {
           </Card>
         </motion.div>
 
-        {/* Recent Complaints Section */}
+        {/* Recent Campus Resolve Section */}
         <div className="grid grid-cols-1 gap-6">
-          <Card>
+          <Card className="bg-glass-teal rounded-2xl shadow-md">
             <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle>Recent Complaints</CardTitle>
-              <Button variant="ghost" size="sm" asChild>
+              <CardTitle className="text-teal-500">Recent Campus Resolve</CardTitle>
+              <Button variant="ghost" size="sm" asChild className="bg-teal-500 rounded-lg">
                 <Link to="/admin/complaints" aria-label="View all complaints">
                   View All
                   <ArrowRight className="ml-1 h-4 w-4" />
@@ -160,9 +162,9 @@ const AdminDashboard = () => {
                 <div className="text-center py-8">
                   <p className="text-red-600">{error}</p>
                 </div>
-              ) : complaints.length > 0 ? (
+              ) : campusResolves.length > 0 ? (
                 <div className="space-y-2">
-                  {complaints.slice(0, 5).map((complaint) => (
+                  {campusResolves.slice(0, 5).map((complaint) => (
                     <Link
                       key={complaint.id}
                       to={`/admin/complaints/${complaint.id}`}

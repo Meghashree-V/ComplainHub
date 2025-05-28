@@ -90,6 +90,9 @@ export interface ComplaintCategoryOption {
 }
 
 export const COMPLAINT_CATEGORY_OPTIONS: ComplaintCategoryOption[] = [
+
+
+
   {
     value: 'academic',
     label: 'Academic',
@@ -126,3 +129,7 @@ export const COMPLAINT_CATEGORY_OPTIONS: ComplaintCategoryOption[] = [
     description: 'Any other issues not covered by the categories above'
   }
 ];
+
+// Campus Resolve rebranding aliases
+export type CampusResolve = Complaint;
+export type CampusResolveStatus = ComplaintStatus;

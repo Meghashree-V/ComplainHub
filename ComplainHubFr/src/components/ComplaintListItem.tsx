@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { format } from "date-fns";
-import { Complaint } from "@/lib/types";
+import { CampusResolve } from "@/lib/types";
 import StatusBadge from "./StatusBadge";
 import { motion } from "framer-motion";
 import { FileText, MoreHorizontal, Clock, MessageSquare } from "lucide-react";
@@ -13,24 +13,24 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-interface ComplaintListItemProps {
-  complaint: Complaint;
-  onStatusChange?: (id: string, status: Complaint["status"]) => void;
+interface CampusResolveListItemProps {
+  complaint: CampusResolve;
+  onStatusChange?: (id: string, status: CampusResolve["status"]) => void;
   onAddComment?: (id: string, comment: string) => Promise<void>;
   isAdmin?: boolean;
   index?: number;
 }
 
-const ComplaintListItem = ({
+const CampusResolveListItem = ({
   complaint,
   onStatusChange,
   isAdmin = false,
   index = 0,
-}: ComplaintListItemProps) => {
+}: CampusResolveListItemProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const basePath = isAdmin ? "/admin/complaints" : "/complaints";
 
-  const getPriorityColor = (priority: Complaint["priority"]) => {
+  const getPriorityColor = (priority: CampusResolve["priority"]) => {
     switch (priority) {
       case "high":
         return "text-red-500";
@@ -111,7 +111,7 @@ const ComplaintListItem = ({
         </div>
 
         <div className="flex items-center gap-3 mt-3 sm:mt-0 self-end sm:self-center">
-          <StatusBadge status={complaint.status} />
+          <StatusBadge status={complaint.status} className="bg-teal-500 text-white" />
 
           {isAdmin && (
             <>
@@ -142,7 +142,7 @@ const ComplaintListItem = ({
                     onClick={() => onStatusChange?.(complaint.id, "rejected")}
                     className="text-red-500"
                   >
-                    Reject Complaint
+                    Reject Campus Resolve
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -161,4 +161,4 @@ const ComplaintListItem = ({
   );
 };
 
-export default ComplaintListItem;
+export default CampusResolveListItem;

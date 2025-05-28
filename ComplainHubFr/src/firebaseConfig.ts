@@ -6,10 +6,10 @@ import { getDatabase } from "firebase/database";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDJWyEg9PeRTxZp2wE_FHj_VLOJsPRNTTA",
-  authDomain: "complainhub-144c8.firebaseapp.com",
-  databaseURL: "https://complainhub-144c8-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "complainhub-144c8",
-  storageBucket: "complainhub-144c8.firebasestorage.app",
+  authDomain: "campusresolve-144c8.firebaseapp.com",
+  databaseURL: "https://campusresolve-144c8-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "campusresolve-144c8",
+  storageBucket: "campusresolve-144c8.firebasestorage.app",
   messagingSenderId: "578139933188",
   appId: "1:578139933188:web:a2f350fcaad5bc0c24c351"
 };
