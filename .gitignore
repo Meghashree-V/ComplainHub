@@ -1,2 +1,3 @@
-# Ignore Firebase service account key
+# Ignore Firebase service account keys
 ComplainHubBackend/target/classes/firebase-service-account.json
+ComplainHubBackend/src/main/resources/firebase-service-account.json
