@@ -7,6 +7,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import java.util.Collections;
 
 @Service
 public class ComplaintService {
@@ -14,7 +19,31 @@ public class ComplaintService {
 
     public ResponseEntity<?> createComplaint(Map<String, Object> payload) {
         try {
+            // Ensure studentId is always set
+            if (!payload.containsKey("studentId") && payload.containsKey("uid")) {
+                payload.put("studentId", payload.get("uid"));
+            }
+            
+            // Log the incoming payload for debugging
+            System.out.println("Creating complaint with payload: " + payload);
+            
+            // Ensure required fields are present
+            if (!payload.containsKey("title") || !payload.containsKey("description")) {
+                return ResponseEntity.badRequest().body("Missing required fields: title or description");
+            }
+            
+            // Set default values if missing
+            if (!payload.containsKey("status")) {
+                payload.put("status", "pending");
+            }
+            if (!payload.containsKey("category")) {
+                payload.put("category", "general");
+            }
+            
             Firestore db = FirestoreClient.getFirestore();
+            
+            // Always set both createdAt and timestamp fields
+            payload.put("createdAt", new Date());
             payload.put("timestamp", new Date());
             ApiFuture<DocumentReference> future = db.collection(COMPLAINTS_COLLECTION).add(payload);
             Map<String, Object> response = new HashMap<>();
@@ -127,6 +156,22 @@ public class ComplaintService {
             return ResponseEntity.ok("Comment added successfully");
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Error adding comment: " + e.getMessage());
+        }
+    }
+
+    // ADMIN: Classify complaint priority using ML API
+    public ResponseEntity<?> classifyComplaintPriority(String complaintText) {
+        try {
+            String apiUrl = "http://localhost:8000/predict_priority";
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            String payload = String.format("{\"complaint\": \"%s\"}", complaintText.replace("\"", "\\\""));
+            HttpEntity<String> request = new HttpEntity<>(payload, headers);
+            org.springframework.http.ResponseEntity<Map> response = restTemplate.postForEntity(apiUrl, request, Map.class);
+            return ResponseEntity.ok(response.getBody());
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error classifying complaint priority: " + e.getMessage());
         }
     }
 }

@@ -12,6 +12,11 @@ import java.util.Map;
 @CrossOrigin(origins = "*")
 public class UserController {
 
+    @PutMapping("/edit/{id}")
+    public ResponseEntity<?> editUser(@PathVariable String id, @RequestBody Map<String, Object> payload) {
+        return userService.editUser(id, payload);
+    }
+
     @GetMapping("/all")
     public ResponseEntity<?> getAllUsers() {
         return userService.getAllUsers();

@@ -3,6 +3,7 @@ package com.complainhub.service;
 import com.google.firebase.auth.*;
 import com.google.firebase.cloud.FirestoreClient;
 import com.google.cloud.firestore.Firestore;
+import com.google.cloud.firestore.DocumentReference;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,26 @@ import java.util.Map;
 
 @Service
 public class UserService {
+    public ResponseEntity<?> editUser(String id, Map<String, Object> payload) {
+        try {
+            Firestore db = FirestoreClient.getFirestore();
+            DocumentReference docRef = db.collection("users").document(id);
+            Map<String, Object> updates = new HashMap<>();
+            if (payload.containsKey("name")) {
+                updates.put("name", payload.get("name"));
+            }
+            if (payload.containsKey("department")) {
+                updates.put("department", payload.get("department"));
+            }
+            if (updates.isEmpty()) {
+                return ResponseEntity.badRequest().body("No valid fields to update");
+            }
+            docRef.update(updates).get();
+            return ResponseEntity.ok("User updated successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error updating user: " + e.getMessage());
+        }
+    }
     public ResponseEntity<?> signup(String email, String password, String name, String role, String department, String studentId, String status, String blockReason) {
         try {
             UserRecord.CreateRequest request = new UserRecord.CreateRequest()

@@ -1,0 +1,5 @@
+com\complainhub\controller\AuthController$TokenRequest.class
+com\complainhub\ComplainHubBackendApplication.class
+com\complainhub\service\ComplaintService.class
+com\complainhub\controller\ComplaintController.class
+com\complainhub\controller\AuthController.class
